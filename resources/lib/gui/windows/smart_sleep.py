@@ -22,9 +22,19 @@ class SmartSleepWindow(BaseWindow):
         self.setProperty("smart_sleep.panel.y", str(panel_y))
         self.setProperty("smart_sleep.font", f"font{font_size}")
         self.setProperty("smart_sleep.panel.color", f"{opacity:02X}000000")
+        self.setProperty("smart_sleep.debug.font", f"font{font_size}")
+        self.setProperty("smart_sleep.debug.panel.color", f"{opacity:02X}000000")
+        self.set_debug_enabled(g.get_bool_setting("smart_sleep.debug_mode"))
 
     def set_countdown_text(self, text):
         self.setProperty("smart_sleep.countdown.text", text)
+
+    def set_debug_enabled(self, enabled):
+        self.setProperty("smart_sleep.debug.enabled", "true" if enabled else "false")
+
+    def update_debug_info(self, info):
+        for key, value in info.items():
+            self.setProperty(f"smart_sleep.debug.{key}", str(value))
 
     def handle_action(self, action_id, control_id=None):
         if action_id == 7 and control_id == self.CANCEL_BUTTON_ID:
