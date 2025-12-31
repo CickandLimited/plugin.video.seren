@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">3001</defaultcontrol>
+
+    <controls>
+        <control type="group">
+            <left>$INFO[Window.Property(smart_sleep.panel.x)]</left>
+            <top>$INFO[Window.Property(smart_sleep.panel.y)]</top>
+            <width>360</width>
+            <height>160</height>
+
+            <animation type="WindowOpen" reversible="false">
+                <effect type="fade" start="0" end="100" time="200" tween="cubic" easing="in"/>
+            </animation>
+
+            <animation type="WindowClose" reversible="false">
+                <effect type="fade" start="100" end="0" time="200" tween="cubic" easing="in"/>
+            </animation>
+
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <texture colordiffuse="$INFO[Window.Property(smart_sleep.panel.color)]">$INFO[Window.Property(texture.white)]</texture>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>20</top>
+                <font>$INFO[Window.Property(smart_sleep.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30655]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>60</top>
+                <font>$INFO[Window.Property(smart_sleep.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$INFO[Window.Property(smart_sleep.countdown.text)]</label>
+            </control>
+
+            <control type="button" id="3001">
+                <left>20</left>
+                <bottom>20</bottom>
+                <height>42</height>
+                <width>120</width>
+                <font>font12</font>
+                <textcolor>ddffffff</textcolor>
+                <focusedcolor>eeffffff</focusedcolor>
+                <selectedcolor>ddffffff</selectedcolor>
+                <align>center</align>
+                <texturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</texturefocus>
+                <texturenofocus border="10" colordiffuse="99000000">white.png</texturenofocus>
+                <label>$ADDON[plugin.video.seren 30070]</label>
+                <pulseonselect>no</pulseonselect>
+            </control>
+        </control>
+    </controls>
+</window>

@@ -239,6 +239,17 @@ def mock_still_watching():
         del window
 
 
+def mock_smart_sleep():
+    from resources.lib.gui.windows.smart_sleep import SmartSleepWindow
+
+    try:
+        window = SmartSleepWindow(*SkinManager().confirm_skin_path("smart_sleep.xml"))
+        window.set_countdown_text("09:59")
+        window.doModal()
+    finally:
+        del window
+
+
 def mock_get_sources():
     import time
 
