@@ -40,8 +40,8 @@ class SmartSleepManager:
             )
             if debug_mode:
                 self._ensure_main_dialog()
+                self._update_debug_enabled(debug_mode)
                 self._update_dialog(now)
-                self._ensure_debug_dialog()
                 self._update_debug_dialog(
                     now,
                     start_time,
@@ -92,6 +92,7 @@ class SmartSleepManager:
                         g.log("Smart sleep countdown delay elapsed", "debug")
                         self._start_countdown(now)
                     self._ensure_main_dialog()
+                    self._update_debug_enabled(debug_mode)
                     self._update_dialog(now)
                     if self._countdown_deadline and now >= self._countdown_deadline:
                         self._complete_shutdown()
@@ -106,10 +107,11 @@ class SmartSleepManager:
             self._clear_countdown_arming()
             self._clear_countdown()
             self._ensure_main_dialog()
+            self._update_debug_enabled(debug_mode)
             self._update_dialog(now)
 
         if debug_mode:
-            self._ensure_debug_dialog()
+            self._update_debug_enabled(debug_mode)
             self._update_debug_dialog(
                 now,
                 start_time,
@@ -121,6 +123,7 @@ class SmartSleepManager:
             )
         else:
             self._close_debug_dialog()
+            self._update_debug_enabled(debug_mode)
 
     def close(self):
         self._reset_state(close_dialog=True, close_debug=True)
@@ -251,6 +254,10 @@ class SmartSleepManager:
             )
             self._dialog.show()
 
+    def _update_debug_enabled(self, enabled):
+        if self._dialog:
+            self._dialog.set_debug_enabled(enabled)
+
     def _ensure_debug_dialog(self):
         if self._debug_dialog and self._debug_dialog.closed:
             self._debug_dialog = None
@@ -289,7 +296,7 @@ class SmartSleepManager:
         return f"{value.hour:02d}:{value.minute:02d}"
 
     def _update_debug_dialog(self, now, start_time, end_time, window_state, snooze_until, reason, enabled):
-        if not self._debug_dialog:
+        if not self._dialog:
             return
         active = enabled and window_state and window_state.get("active")
         countdown_remaining = "--:--"
@@ -311,7 +318,7 @@ class SmartSleepManager:
             "next_trigger": next_trigger,
             "state_reason": reason,
         }
-        self._debug_dialog.update_info(info)
+        self._dialog.update_debug_info(info)
 
     def _reset_state(self, clear_snooze=False, close_dialog=False, close_debug=False, clear_arming=False):
         if clear_snooze:
