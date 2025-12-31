@@ -2096,6 +2096,18 @@
 						</dependency>
 					</dependencies>
 				</setting>
+				<setting id="smart_sleep.end_time" type="string" label="30657" help="">
+					<level>0</level>
+					<default>05:00</default>
+					<control type="button" format="time">
+						<heading>30657</heading>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
 				<setting id="smart_sleep.countdown_minutes" type="integer" label="30648" help="">
 					<level>0</level>
 					<default>10</default>

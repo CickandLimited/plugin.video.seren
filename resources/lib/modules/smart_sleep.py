@@ -24,21 +24,21 @@ class SmartSleepManager:
             return
 
         start_time = self._parse_start_time(g.get_setting("smart_sleep.start_time"))
-        if not start_time:
+        end_time = self._parse_end_time(g.get_setting("smart_sleep.end_time"))
+        if not start_time or not end_time:
             return
 
         now = datetime.now(g.LOCAL_TIMEZONE)
-        start_dt = now.replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
-
-        if now < start_dt:
-            self._next_trigger = start_dt
+        window_state = self._get_window_state(now, start_time, end_time)
+        if not window_state["active"]:
+            self._next_trigger = window_state["next_trigger"]
             self._reset_state(clear_snooze=True, close_dialog=True)
             return
 
-        self._next_trigger = start_dt + timedelta(days=1)
+        self._next_trigger = window_state["next_trigger"]
         snooze_until = self._get_snooze_until()
         if snooze_until:
-            if snooze_until <= start_dt:
+            if snooze_until >= window_state["end"]:
                 self._clear_snooze_until()
                 snooze_until = None
             elif now < snooze_until:
@@ -78,6 +78,46 @@ class SmartSleepManager:
         except (TypeError, ValueError):
             g.log(f"Invalid smart sleep start time '{value}'", "warning")
             return None
+
+    def _parse_end_time(self, value):
+        if not value:
+            return None
+        try:
+            parts = value.strip().split(":")
+            if len(parts) < 2:
+                return None
+            return time(hour=int(parts[0]), minute=int(parts[1]))
+        except (TypeError, ValueError):
+            g.log(f"Invalid smart sleep end time '{value}'", "warning")
+            return None
+
+    def _get_window_state(self, now, start_time, end_time):
+        start_today = now.replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
+        end_today = now.replace(hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0)
+
+        if start_time <= end_time:
+            if now < start_today:
+                return {"active": False, "end": end_today, "next_trigger": start_today}
+            if now >= end_today:
+                return {
+                    "active": False,
+                    "end": end_today,
+                    "next_trigger": start_today + timedelta(days=1),
+                }
+            return {"active": True, "end": end_today, "next_trigger": start_today + timedelta(days=1)}
+
+        if now >= start_today:
+            window_end = end_today + timedelta(days=1)
+            return {
+                "active": now < window_end,
+                "end": window_end,
+                "next_trigger": start_today + timedelta(days=1),
+            }
+
+        window_start = start_today - timedelta(days=1)
+        if now < end_today:
+            return {"active": True, "end": end_today, "next_trigger": start_today}
+        return {"active": False, "end": end_today, "next_trigger": start_today}
 
     def _get_snooze_until(self):
         value = g.get_setting("smart_sleep.snooze_until")
