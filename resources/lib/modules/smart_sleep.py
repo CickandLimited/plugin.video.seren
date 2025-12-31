@@ -18,6 +18,8 @@ class SmartSleepManager:
         self._countdown_armed_at = None
         self._next_trigger = None
         self._last_snooze_key_press = None
+        self._manual_triggered_until = None
+        self._last_manual_key_press = None
 
     def tick(self, monitor=None):
         if monitor and monitor.abortRequested():
@@ -27,7 +29,13 @@ class SmartSleepManager:
         debug_mode = g.get_bool_setting("smart_sleep.debug_mode")
         enabled = g.get_bool_setting("smart_sleep.enabled")
         if not enabled and not debug_mode:
-            self._reset_state(clear_snooze=True, close_dialog=True, close_debug=True, clear_arming=True)
+            self._reset_state(
+                clear_snooze=True,
+                close_dialog=True,
+                close_debug=True,
+                clear_arming=True,
+                clear_manual=True,
+            )
             return
 
         start_time = self._parse_start_time(g.get_setting("smart_sleep.start_time"))
@@ -39,6 +47,7 @@ class SmartSleepManager:
                 close_dialog=not debug_mode,
                 close_debug=not debug_mode,
                 clear_arming=True,
+                clear_manual=True,
             )
             if debug_mode:
                 self._ensure_main_dialog()
@@ -64,14 +73,21 @@ class SmartSleepManager:
                 self._clear_snooze_until()
                 snooze_until = None
 
-        in_window = window_state["active"] and enabled
+        manual_triggered = self._manual_triggered_until and now < self._manual_triggered_until
+        if self._manual_triggered_until and not manual_triggered:
+            self._clear_manual_trigger()
+            manual_triggered = False
+
+        in_window = enabled and (window_state["active"] or manual_triggered)
         reason = "waiting for window"
 
         if in_window:
+            if manual_triggered and not window_state["active"]:
+                reason = "manual trigger"
             if snooze_until and now < snooze_until:
                 reason = "snoozed"
                 if not debug_mode:
-                    self._reset_state(close_dialog=True, clear_arming=True)
+                    self._reset_state(close_dialog=True, clear_arming=True, clear_manual=True)
                     return
                 self._clear_countdown_arming()
                 self._clear_countdown()
@@ -103,7 +119,7 @@ class SmartSleepManager:
         else:
             reason = "disabled" if not enabled else "waiting for window"
             if not debug_mode:
-                self._reset_state(clear_snooze=True, close_dialog=True, clear_arming=True)
+                self._reset_state(clear_snooze=True, close_dialog=True, clear_arming=True, clear_manual=True)
                 return
             self._clear_snooze_until()
             self._clear_countdown_arming()
@@ -128,7 +144,7 @@ class SmartSleepManager:
             self._update_debug_enabled(debug_mode)
 
     def close(self):
-        self._reset_state(close_dialog=True, close_debug=True)
+        self._reset_state(close_dialog=True, close_debug=True, clear_manual=True)
 
     def _parse_start_time(self, value):
         if not value:
@@ -223,8 +239,10 @@ class SmartSleepManager:
     def _handle_cancel(self):
         now = datetime.now(g.LOCAL_TIMEZONE)
         self._snooze(now)
+        self._clear_manual_trigger()
 
     def _handle_action(self, action_id, button_code):
+        self._handle_manual_trigger(action_id, button_code)
         if not self._countdown_deadline:
             return
         codes = self._get_snooze_key_codes()
@@ -240,7 +258,14 @@ class SmartSleepManager:
         self._last_snooze_key_press = now
 
     def _get_snooze_key_codes(self):
-        value = g.get_setting("smart_sleep.snooze_key_code")
+        return self._get_key_codes("smart_sleep.snooze_key_code")
+
+    def _get_manual_key_codes(self):
+        return self._get_key_codes("smart_sleep.manual_key_code")
+
+    @staticmethod
+    def _get_key_codes(setting_id):
+        value = g.get_setting(setting_id)
         if not value:
             return []
         codes = []
@@ -253,15 +278,40 @@ class SmartSleepManager:
                 codes.append(code)
         return codes
 
+    def _handle_manual_trigger(self, action_id, button_code):
+        if not xbmc.getCondVisibility("Player.HasMedia"):
+            return
+        codes = self._get_manual_key_codes()
+        if not codes:
+            return
+        if action_id not in codes and (button_code not in codes if button_code else True):
+            return
+        now = time_module.monotonic()
+        if self._last_manual_key_press and (now - self._last_manual_key_press) <= 0.4:
+            self._last_manual_key_press = None
+            self._trigger_manual_countdown()
+            return
+        self._last_manual_key_press = now
+
+    def _trigger_manual_countdown(self):
+        if not g.get_bool_setting("smart_sleep.enabled"):
+            return
+        now = datetime.now(g.LOCAL_TIMEZONE)
+        if not self._countdown_deadline:
+            self._start_countdown(now)
+            self._countdown_armed_at = now - timedelta(seconds=10)
+        self._manual_triggered_until = self._countdown_deadline or now
+        g.log("Smart sleep manually triggered", "info")
+
     def _snooze(self, now):
         snooze_minutes = max(1, g.get_int_setting("smart_sleep.snooze_minutes", 15))
         snooze_until = now + timedelta(minutes=snooze_minutes)
         self._set_snooze_until(snooze_until)
         g.log(f"Smart sleep snoozed until {snooze_until.isoformat()}", "info")
-        self._reset_state(close_dialog=True, clear_arming=True)
+        self._reset_state(close_dialog=True, clear_arming=True, clear_manual=True)
 
     def _complete_shutdown(self):
-        self._reset_state(clear_snooze=True, close_dialog=True, close_debug=True, clear_arming=True)
+        self._reset_state(clear_snooze=True, close_dialog=True, close_debug=True, clear_arming=True, clear_manual=True)
         g.log("Smart sleep countdown completed, powering down", "info")
         try:
             xbmc.executebuiltin("CECStandby")
@@ -353,9 +403,18 @@ class SmartSleepManager:
         }
         self._dialog.update_debug_info(info)
 
-    def _reset_state(self, clear_snooze=False, close_dialog=False, close_debug=False, clear_arming=False):
+    def _reset_state(
+        self,
+        clear_snooze=False,
+        close_dialog=False,
+        close_debug=False,
+        clear_arming=False,
+        clear_manual=False,
+    ):
         if clear_snooze:
             self._clear_snooze_until()
+        if clear_manual:
+            self._clear_manual_trigger()
         if close_dialog:
             self._close_main_dialog()
         if close_debug:
@@ -363,7 +422,12 @@ class SmartSleepManager:
         if clear_arming:
             self._clear_countdown_arming()
         self._last_snooze_key_press = None
+        self._last_manual_key_press = None
         self._clear_countdown()
 
     def _clear_countdown_arming(self):
         self._countdown_armed_at = None
+
+    def _clear_manual_trigger(self):
+        self._manual_triggered_until = None
+        self._last_manual_key_press = None

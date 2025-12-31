@@ -2158,6 +2158,19 @@
 						</dependency>
 					</dependencies>
 				</setting>
+				<setting id="smart_sleep.manual_key_capture" type="action" label="30672" help="30673">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=smartSleepManualCaptureKey)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
 				<setting id="smart_sleep.widget_x" type="integer" label="30651" help="">
 					<level>0</level>
 					<default>20</default>
@@ -2223,6 +2236,10 @@
 					</dependencies>
 				</setting>
 				<setting id="smart_sleep.snooze_key_code" type="string" help="" visible="false">
+					<level>4</level>
+					<default/>
+				</setting>
+				<setting id="smart_sleep.manual_key_code" type="string" help="" visible="false">
 					<level>4</level>
 					<default/>
 				</setting>
