@@ -30,7 +30,7 @@
                 <height>60</height>
                 <font>font20</font>
                 <textcolor>ffffffff</textcolor>
-                <label>$ADDON[plugin.video.seren 30670]</label>
+                <label>$INFO[Window.Property(key_capture.title),$ADDON[plugin.video.seren 30670]]</label>
                 <align>center</align>
             </control>
 
@@ -41,7 +41,7 @@
                 <height>60</height>
                 <font>font14</font>
                 <textcolor>ccffffff</textcolor>
-                <label>$ADDON[plugin.video.seren 30669]</label>
+                <label>$INFO[Window.Property(key_capture.description),$ADDON[plugin.video.seren 30669]]</label>
                 <align>center</align>
             </control>
         </control>

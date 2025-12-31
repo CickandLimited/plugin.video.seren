@@ -408,6 +408,11 @@ def dispatch(params):
 
         capture_snooze_key()
 
+    elif action == "smartSleepManualCaptureKey":
+        from resources.lib.gui.windows.key_capture import capture_manual_key
+
+        capture_manual_key()
+
     elif action == "myTraktLists":
         from resources.lib.modules.listsHelper import ListsHelper
 

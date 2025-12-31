@@ -4,10 +4,12 @@ from resources.lib.modules.globals import g
 
 
 class KeyCaptureWindow(BaseWindow):
-    def __init__(self, xml_file, xml_location, on_capture=None):
+    def __init__(self, xml_file, xml_location, on_capture=None, title="", description=""):
         super().__init__(xml_file, xml_location)
         self._on_capture = on_capture
         self.closed = False
+        self.setProperty("key_capture.title", title)
+        self.setProperty("key_capture.description", description)
 
     def onAction(self, action):
         if self.closed:
@@ -28,7 +30,7 @@ class KeyCaptureWindow(BaseWindow):
         super().close()
 
 
-def capture_snooze_key():
+def capture_key(setting_id, title_id, description_id, notification_id):
     def _store_key(action_id, button_code):
         codes = []
         if button_code and button_code > 0:
@@ -38,9 +40,22 @@ def capture_snooze_key():
         if not codes:
             return
         value = ":".join(str(code) for code in codes)
-        g.set_setting("smart_sleep.snooze_key_code", value)
-        g.notification(g.ADDON_NAME, g.get_language_string(30671).format(value))
+        g.set_setting(setting_id, value)
+        g.notification(g.ADDON_NAME, g.get_language_string(notification_id).format(value))
 
-    window = KeyCaptureWindow(*SkinManager().confirm_skin_path("key_capture.xml"), on_capture=_store_key)
+    window = KeyCaptureWindow(
+        *SkinManager().confirm_skin_path("key_capture.xml"),
+        on_capture=_store_key,
+        title=g.get_language_string(title_id),
+        description=g.get_language_string(description_id),
+    )
     window.doModal()
     del window
+
+
+def capture_snooze_key():
+    capture_key("smart_sleep.snooze_key_code", 30670, 30669, 30671)
+
+
+def capture_manual_key():
+    capture_key("smart_sleep.manual_key_code", 30674, 30673, 30675)

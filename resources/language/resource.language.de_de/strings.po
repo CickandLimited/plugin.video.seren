@@ -3805,3 +3805,24 @@ msgctxt "#30671"
 msgid "Snooze key captured: {}"
 msgstr "Snooze key captured: {}"
 
+#: /resources/settings.xml:356
+msgctxt "#30672"
+msgid "Capture Manual Trigger Key"
+msgstr "Capture Manual Trigger Key"
+
+#: /resources/settings.xml:356 /resources/skins/Default/1080i/key_capture.xml:30
+msgctxt "#30673"
+msgid "Press a key/button twice during playback to start the smart sleep countdown."
+msgstr "Press a key/button twice during playback to start the smart sleep countdown."
+
+#: /resources/skins/Default/1080i/key_capture.xml:22
+msgctxt "#30674"
+msgid "Press a key to set the manual trigger shortcut"
+msgstr "Press a key to set the manual trigger shortcut"
+
+#: /resources/lib/gui/windows/key_capture.py:47
+msgctxt "#30675"
+msgid "Manual trigger key captured: {}"
+msgstr "Manual trigger key captured: {}"
+
+
