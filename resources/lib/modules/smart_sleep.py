@@ -1,4 +1,5 @@
 from datetime import datetime, time, timedelta
+import time as time_module
 
 import xbmc
 
@@ -16,6 +17,7 @@ class SmartSleepManager:
         self._countdown_total_seconds = None
         self._countdown_armed_at = None
         self._next_trigger = None
+        self._last_snooze_key_press = None
 
     def tick(self, monitor=None):
         if monitor and monitor.abortRequested():
@@ -222,6 +224,35 @@ class SmartSleepManager:
         now = datetime.now(g.LOCAL_TIMEZONE)
         self._snooze(now)
 
+    def _handle_action(self, action_id, button_code):
+        if not self._countdown_deadline:
+            return
+        codes = self._get_snooze_key_codes()
+        if not codes:
+            return
+        if action_id not in codes and (button_code not in codes if button_code else True):
+            return
+        now = time_module.monotonic()
+        if self._last_snooze_key_press and (now - self._last_snooze_key_press) <= 0.4:
+            self._last_snooze_key_press = None
+            self._snooze(datetime.now(g.LOCAL_TIMEZONE))
+            return
+        self._last_snooze_key_press = now
+
+    def _get_snooze_key_codes(self):
+        value = g.get_setting("smart_sleep.snooze_key_code")
+        if not value:
+            return []
+        codes = []
+        for part in value.split(":"):
+            try:
+                code = int(part)
+            except ValueError:
+                continue
+            if code not in codes:
+                codes.append(code)
+        return codes
+
     def _snooze(self, now):
         snooze_minutes = max(1, g.get_int_setting("smart_sleep.snooze_minutes", 15))
         snooze_until = now + timedelta(minutes=snooze_minutes)
@@ -250,7 +281,9 @@ class SmartSleepManager:
             self._dialog = None
         if not self._dialog:
             self._dialog = SmartSleepWindow(
-                *SkinManager().confirm_skin_path("smart_sleep.xml"), on_cancel=self._handle_cancel
+                *SkinManager().confirm_skin_path("smart_sleep.xml"),
+                on_cancel=self._handle_cancel,
+                on_action=self._handle_action,
             )
             self._dialog.show()
 
@@ -329,6 +362,7 @@ class SmartSleepManager:
             self._close_debug_dialog()
         if clear_arming:
             self._clear_countdown_arming()
+        self._last_snooze_key_press = None
         self._clear_countdown()
 
     def _clear_countdown_arming(self):

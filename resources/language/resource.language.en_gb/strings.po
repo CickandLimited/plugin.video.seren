@@ -3710,6 +3710,26 @@ msgctxt "#30654"
 msgid "Dialog Transparency"
 msgstr "Dialog Transparency"
 
+#: /resources/settings.xml:356
+msgctxt "#30668"
+msgid "Capture Snooze Key"
+msgstr "Capture Snooze Key"
+
+#: /resources/settings.xml:356 /resources/skins/Default/1080i/key_capture.xml:30
+msgctxt "#30669"
+msgid "Press a key/button twice during the countdown to snooze."
+msgstr "Press a key/button twice during the countdown to snooze."
+
+#: /resources/skins/Default/1080i/key_capture.xml:22
+msgctxt "#30670"
+msgid "Press a key to set the snooze shortcut"
+msgstr "Press a key to set the snooze shortcut"
+
+#: /resources/lib/gui/windows/key_capture.py:34
+msgctxt "#30671"
+msgid "Snooze key captured: {}"
+msgstr "Snooze key captured: {}"
+
 #: /resources/skins/Default/1080i/smart_sleep.xml:34
 msgctxt "#30655"
 msgid "Shutdown in"

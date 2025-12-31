@@ -403,6 +403,11 @@ def dispatch(params):
     elif action == "openSettings":
         xbmc.executebuiltin(f"Addon.OpenSettings({g.ADDON_ID})")
 
+    elif action == "smartSleepCaptureKey":
+        from resources.lib.gui.windows.key_capture import capture_snooze_key
+
+        capture_snooze_key()
+
     elif action == "myTraktLists":
         from resources.lib.modules.listsHelper import ListsHelper
 
