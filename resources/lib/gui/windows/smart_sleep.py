@@ -5,9 +5,10 @@ from resources.lib.modules.globals import g
 class SmartSleepWindow(BaseWindow):
     CANCEL_BUTTON_ID = 3001
 
-    def __init__(self, xml_file, xml_location, on_cancel=None):
+    def __init__(self, xml_file, xml_location, on_cancel=None, on_action=None):
         super().__init__(xml_file, xml_location)
         self._on_cancel = on_cancel
+        self._on_action = on_action
         self.closed = False
         self._apply_style_properties()
 
@@ -39,6 +40,13 @@ class SmartSleepWindow(BaseWindow):
     def handle_action(self, action_id, control_id=None):
         if action_id == 7 and control_id == self.CANCEL_BUTTON_ID:
             self._cancel()
+
+    def onAction(self, action):
+        action_id = action.getId()
+        button_code = action.getButtonCode()
+        if self._on_action:
+            self._on_action(action_id, button_code)
+        super().onAction(action)
 
     def _cancel(self):
         if self.closed:
