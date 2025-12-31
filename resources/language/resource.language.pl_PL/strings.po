@@ -3710,6 +3710,11 @@ msgid "Start Time (HH:MM)"
 msgstr "Start Time (HH:MM)"
 
 #: /resources/settings.xml:326
+msgctxt "#30657"
+msgid "End Time (HH)"
+msgstr "End Time (HH)"
+
+#: /resources/settings.xml:326
 msgctxt "#30648"
 msgid "Countdown Minutes"
 msgstr "Countdown Minutes"
