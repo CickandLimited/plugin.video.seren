@@ -14,6 +14,7 @@ from resources.lib.modules.globals import g
 
 from resources.lib.modules.seren_version import do_version_change
 from resources.lib.modules.serenMonitor import SerenMonitor
+from resources.lib.modules.smart_sleep import SmartSleepManager
 from resources.lib.modules.update_news import do_update_news
 from resources.lib.modules.manual_timezone import validate_timezone_detected
 
@@ -30,6 +31,7 @@ g.log(f"### Detected timezone: {repr(g.LOCAL_TIMEZONE.zone)}")
 g.log("#############  SERVICE ENTERED KEEP ALIVE  #################")
 
 monitor = SerenMonitor()
+smart_sleep_manager = SmartSleepManager()
 try:
     xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=longLifeServiceManager")')
 
@@ -47,15 +49,20 @@ try:
 
     g.wait_for_abort(30)  # Sleep for a half a minute to allow widget loads to complete.
     while not monitor.abortRequested():
+        smart_sleep_manager.tick(monitor)
         xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")')
         if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
+            smart_sleep_manager.tick(monitor)
             xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")')
         if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
+            smart_sleep_manager.tick(monitor)
             xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=cleanOrphanedMetadata")')
         if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
+            smart_sleep_manager.tick(monitor)
             xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")')
         if g.wait_for_abort(60 * randint(13, 17)):
             break
 finally:
+    smart_sleep_manager.close()
     del monitor
     g.deinit()

@@ -307,6 +307,61 @@
 					</control>
 				</setting>
 			</group>
+			<group id="5" label="30645">
+				<setting id="smart_sleep.enabled" type="boolean" label="30646" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="smart_sleep.start_time" type="string" label="30647" help="">
+					<level>0</level>
+					<default>23:00</default>
+					<control type="edit" format="string">
+						<heading>30647</heading>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
+				<setting id="smart_sleep.countdown_minutes" type="integer" label="30648" help="">
+					<level>0</level>
+					<default>10</default>
+					<constraints>
+						<minimum>1</minimum>
+						<maximum>120</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
+				<setting id="smart_sleep.snooze_minutes" type="integer" label="30649" help="">
+					<level>0</level>
+					<default>15</default>
+					<constraints>
+						<minimum>1</minimum>
+						<maximum>120</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
+				<setting id="smart_sleep.snooze_until" type="string" help="" visible="false">
+					<level>4</level>
+					<default/>
+				</setting>
+			</group>
 		</category>
 		<category id="themes" label="30199" help="">
 			<group id="1" label="30595">
