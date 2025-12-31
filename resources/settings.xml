@@ -2084,6 +2084,11 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
+				<setting id="smart_sleep.debug_mode" type="boolean" label="30658" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="smart_sleep.start_time" type="string" label="30647" help="">
 					<level>0</level>
 					<default>23:00</default>

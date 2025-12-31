@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <controls>
+        <control type="group">
+            <right>20</right>
+            <top>20</top>
+            <width>520</width>
+            <height>360</height>
+
+            <animation type="WindowOpen" reversible="false">
+                <effect type="fade" start="0" end="100" time="200" tween="cubic" easing="in"/>
+            </animation>
+
+            <animation type="WindowClose" reversible="false">
+                <effect type="fade" start="100" end="0" time="200" tween="cubic" easing="in"/>
+            </animation>
+
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <texture colordiffuse="$INFO[Window.Property(smart_sleep.debug.panel.color)]">$INFO[Window.Property(texture.white)]</texture>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>20</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30659]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>60</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30660]: $INFO[Window.Property(smart_sleep.debug.active)]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>90</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30661]: $INFO[Window.Property(smart_sleep.debug.current_time)]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>120</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30662]: $INFO[Window.Property(smart_sleep.debug.start_time)]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>150</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30663]: $INFO[Window.Property(smart_sleep.debug.end_time)]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>180</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30664]: $INFO[Window.Property(smart_sleep.debug.countdown_remaining)]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>210</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30665]: $INFO[Window.Property(smart_sleep.debug.snooze_remaining)]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>240</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30666]: $INFO[Window.Property(smart_sleep.debug.next_trigger)]</label>
+            </control>
+
+            <control type="label">
+                <left>20</left>
+                <top>270</top>
+                <font>$INFO[Window.Property(smart_sleep.debug.font)]</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$ADDON[plugin.video.seren 30667]: $INFO[Window.Property(smart_sleep.debug.state_reason)]</label>
+            </control>
+        </control>
+    </controls>
+</window>
