@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import time
 from random import randint
 
 import xbmc
@@ -32,6 +33,20 @@ g.log("#############  SERVICE ENTERED KEEP ALIVE  #################")
 
 monitor = SerenMonitor()
 smart_sleep_manager = SmartSleepManager()
+
+
+def wait_for_abort_with_ticks(monitor_handle, smart_sleep, timeout, interval=1):
+    deadline = time.monotonic() + timeout
+    while not monitor_handle.abortRequested():
+        smart_sleep.tick(monitor_handle)
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return False
+        if monitor_handle.waitForAbort(min(interval, remaining)):
+            return True
+    return True
+
+
 try:
     xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=longLifeServiceManager")')
 
@@ -51,16 +66,16 @@ try:
     while not monitor.abortRequested():
         smart_sleep_manager.tick(monitor)
         xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")')
-        if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
-            smart_sleep_manager.tick(monitor)
-            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")')
-        if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
-            smart_sleep_manager.tick(monitor)
-            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=cleanOrphanedMetadata")')
-        if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
-            smart_sleep_manager.tick(monitor)
-            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")')
-        if g.wait_for_abort(60 * randint(13, 17)):
+        if wait_for_abort_with_ticks(monitor, smart_sleep_manager, 15):
+            break
+        xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")')
+        if wait_for_abort_with_ticks(monitor, smart_sleep_manager, 15):
+            break
+        xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=cleanOrphanedMetadata")')
+        if wait_for_abort_with_ticks(monitor, smart_sleep_manager, 15):
+            break
+        xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")')
+        if wait_for_abort_with_ticks(monitor, smart_sleep_manager, 60 * randint(13, 17)):
             break
 finally:
     smart_sleep_manager.close()
