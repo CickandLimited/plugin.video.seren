@@ -14,6 +14,7 @@ class SmartSleepManager:
         self._debug_dialog = None
         self._countdown_deadline = None
         self._countdown_total_seconds = None
+        self._countdown_armed_at = None
         self._next_trigger = None
 
     def tick(self, monitor=None):
@@ -24,14 +25,19 @@ class SmartSleepManager:
         debug_mode = g.get_bool_setting("smart_sleep.debug_mode")
         enabled = g.get_bool_setting("smart_sleep.enabled")
         if not enabled and not debug_mode:
-            self._reset_state(clear_snooze=True, close_dialog=True, close_debug=True)
+            self._reset_state(clear_snooze=True, close_dialog=True, close_debug=True, clear_arming=True)
             return
 
         start_time = self._parse_start_time(g.get_setting("smart_sleep.start_time"))
         end_time = self._parse_end_time(g.get_setting("smart_sleep.end_time"))
         now = datetime.now(g.LOCAL_TIMEZONE)
         if not start_time or not end_time:
-            self._reset_state(clear_snooze=True, close_dialog=not debug_mode, close_debug=not debug_mode)
+            self._reset_state(
+                clear_snooze=True,
+                close_dialog=not debug_mode,
+                close_debug=not debug_mode,
+                clear_arming=True,
+            )
             if debug_mode:
                 self._ensure_main_dialog()
                 self._update_dialog(now)
@@ -63,27 +69,41 @@ class SmartSleepManager:
             if snooze_until and now < snooze_until:
                 reason = "snoozed"
                 if not debug_mode:
-                    self._reset_state(close_dialog=True)
+                    self._reset_state(close_dialog=True, clear_arming=True)
                     return
+                self._clear_countdown_arming()
                 self._clear_countdown()
             else:
                 if snooze_until and now >= snooze_until:
                     self._clear_snooze_until()
                     snooze_until = None
-                if self._countdown_deadline is None:
-                    self._start_countdown(now)
-                self._ensure_main_dialog()
-                self._update_dialog(now)
-                if self._countdown_deadline and now >= self._countdown_deadline:
-                    self._complete_shutdown()
-                    return
-                reason = "counting down"
+                if self._countdown_armed_at is None:
+                    self._countdown_armed_at = now
+                    g.log("Smart sleep countdown delay armed", "debug")
+                delay_deadline = self._countdown_armed_at + timedelta(seconds=10)
+                if now < delay_deadline:
+                    reason = "arming delay"
+                    self._clear_countdown()
+                    self._close_main_dialog()
+                    if not debug_mode:
+                        return
+                else:
+                    if self._countdown_deadline is None:
+                        g.log("Smart sleep countdown delay elapsed", "debug")
+                        self._start_countdown(now)
+                    self._ensure_main_dialog()
+                    self._update_dialog(now)
+                    if self._countdown_deadline and now >= self._countdown_deadline:
+                        self._complete_shutdown()
+                        return
+                    reason = "counting down"
         else:
             reason = "disabled" if not enabled else "waiting for window"
             if not debug_mode:
-                self._reset_state(clear_snooze=True, close_dialog=True)
+                self._reset_state(clear_snooze=True, close_dialog=True, clear_arming=True)
                 return
             self._clear_snooze_until()
+            self._clear_countdown_arming()
             self._clear_countdown()
             self._ensure_main_dialog()
             self._update_dialog(now)
@@ -204,10 +224,10 @@ class SmartSleepManager:
         snooze_until = now + timedelta(minutes=snooze_minutes)
         self._set_snooze_until(snooze_until)
         g.log(f"Smart sleep snoozed until {snooze_until.isoformat()}", "info")
-        self._reset_state(close_dialog=True)
+        self._reset_state(close_dialog=True, clear_arming=True)
 
     def _complete_shutdown(self):
-        self._reset_state(clear_snooze=True, close_dialog=True, close_debug=True)
+        self._reset_state(clear_snooze=True, close_dialog=True, close_debug=True, clear_arming=True)
         g.log("Smart sleep countdown completed, powering down", "info")
         try:
             xbmc.executebuiltin("CECStandby")
@@ -244,6 +264,13 @@ class SmartSleepManager:
                 self._debug_dialog.close()
             finally:
                 self._debug_dialog = None
+
+    def _close_main_dialog(self):
+        if self._dialog:
+            try:
+                self._dialog.close()
+            finally:
+                self._dialog = None
 
     def _format_duration(self, total_seconds):
         total_seconds = max(0, int(total_seconds))
@@ -286,14 +313,16 @@ class SmartSleepManager:
         }
         self._debug_dialog.update_info(info)
 
-    def _reset_state(self, clear_snooze=False, close_dialog=False, close_debug=False):
+    def _reset_state(self, clear_snooze=False, close_dialog=False, close_debug=False, clear_arming=False):
         if clear_snooze:
             self._clear_snooze_until()
-        if close_dialog and self._dialog:
-            try:
-                self._dialog.close()
-            finally:
-                self._dialog = None
+        if close_dialog:
+            self._close_main_dialog()
         if close_debug:
             self._close_debug_dialog()
+        if clear_arming:
+            self._clear_countdown_arming()
         self._clear_countdown()
+
+    def _clear_countdown_arming(self):
+        self._countdown_armed_at = None
