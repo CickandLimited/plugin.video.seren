@@ -3705,6 +3705,11 @@ msgctxt "#30655"
 msgid "Shutdown in"
 msgstr "Shutdown in"
 
+#: /resources/skins/Default/1080i/smart_sleep.xml:58
+msgctxt "#30656"
+msgid "Cancel"
+msgstr "Cancel"
+
 #: /resources/lib/modules/smart_sleep.py:71
 msgctxt "#30650"
 msgid "Smart sleep will power down in {minutes} minute(s). Press cancel to snooze."

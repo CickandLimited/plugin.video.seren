@@ -53,7 +53,7 @@
                 <align>center</align>
                 <texturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</texturefocus>
                 <texturenofocus border="10" colordiffuse="99000000">white.png</texturenofocus>
-                <label>$ADDON[plugin.video.seren 30070]</label>
+                <label>$ADDON[plugin.video.seren 30656]</label>
                 <pulseonselect>no</pulseonselect>
             </control>
         </control>

@@ -3707,6 +3707,67 @@ msgstr ""
 #: /resources/skins/Default/1080i/manual_caching.xml:125
 #: /resources/skins/Default/1080i/manual_caching.xml:238
 #: /resources/skins/Default/1080i/manual_caching.xml:387
+
+#: /resources/settings.xml:310
+msgctxt "#30645"
+msgid "Smart Sleep"
+msgstr "Smart Sleep"
+
+#: /resources/settings.xml:311
+msgctxt "#30646"
+msgid "Enable Smart Sleep"
+msgstr "Enable Smart Sleep"
+
+#: /resources/settings.xml:316
+msgctxt "#30647"
+msgid "Start Time (HH:MM)"
+msgstr "Start Time (HH:MM)"
+
+#: /resources/settings.xml:326
+msgctxt "#30648"
+msgid "Countdown Minutes"
+msgstr "Countdown Minutes"
+
+#: /resources/settings.xml:340
+msgctxt "#30649"
+msgid "Snooze Minutes"
+msgstr "Snooze Minutes"
+
+#: /resources/settings.xml:356
+msgctxt "#30651"
+msgid "Dialog X Position"
+msgstr "Dialog X Position"
+
+#: /resources/settings.xml:369
+msgctxt "#30652"
+msgid "Dialog Y Position"
+msgstr "Dialog Y Position"
+
+#: /resources/settings.xml:382
+msgctxt "#30653"
+msgid "Dialog Font Size"
+msgstr "Dialog Font Size"
+
+#: /resources/settings.xml:395
+msgctxt "#30654"
+msgid "Dialog Transparency"
+msgstr "Dialog Transparency"
+
+#: /resources/skins/Default/1080i/smart_sleep.xml:34
+msgctxt "#30655"
+msgid "Shutdown in"
+msgstr "Shutdown in"
+
+#: /resources/skins/Default/1080i/smart_sleep.xml:58
+msgctxt "#30656"
+msgid "Cancel"
+msgstr "Cancel"
+
+#: /resources/lib/modules/smart_sleep.py:71
+msgctxt "#30650"
+msgid "Smart sleep will power down in {minutes} minute(s). Press cancel to snooze."
+msgstr "Smart sleep will power down in {minutes} minute(s). Press cancel to snooze."
+
 msgctxt "#30486"
 msgid "Seeds"
 msgstr "Semillas"
