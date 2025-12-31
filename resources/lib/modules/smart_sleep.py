@@ -1,8 +1,9 @@
 from datetime import datetime, time, timedelta
 
 import xbmc
-import xbmcgui
 
+from resources.lib.database.skinManager import SkinManager
+from resources.lib.gui.windows.smart_sleep import SmartSleepWindow
 from resources.lib.modules.globals import g
 
 
@@ -49,13 +50,14 @@ class SmartSleepManager:
         if self._countdown_deadline is None:
             self._start_countdown(now)
 
-        if not self._dialog:
-            self._dialog = xbmcgui.DialogProgress()
-            self._dialog.create(g.get_language_string(30645), "")
+        if self._dialog and self._dialog.closed:
+            self._dialog = None
 
-        if self._dialog.iscanceled():
-            self._snooze(now)
-            return
+        if not self._dialog:
+            self._dialog = SmartSleepWindow(
+                *SkinManager().confirm_skin_path("smart_sleep.xml"), on_cancel=self._handle_cancel
+            )
+            self._dialog.show()
 
         self._update_dialog(now)
 
@@ -105,12 +107,13 @@ class SmartSleepManager:
 
     def _update_dialog(self, now):
         remaining = max(0, int((self._countdown_deadline - now).total_seconds()))
-        percent = 0
-        if self._countdown_total_seconds:
-            percent = int((self._countdown_total_seconds - remaining) / self._countdown_total_seconds * 100)
-        minutes_left = max(1, int((remaining + 59) / 60))
-        message = g.get_language_string(30650).format(minutes=minutes_left)
-        self._dialog.update(percent, message)
+        minutes_left, seconds_left = divmod(remaining, 60)
+        countdown_text = f"{minutes_left:02d}:{seconds_left:02d}"
+        self._dialog.set_countdown_text(countdown_text)
+
+    def _handle_cancel(self):
+        now = datetime.now(g.LOCAL_TIMEZONE)
+        self._snooze(now)
 
     def _snooze(self, now):
         snooze_minutes = max(1, g.get_int_setting("smart_sleep.snooze_minutes", 15))

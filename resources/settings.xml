@@ -357,6 +357,70 @@
 						</dependency>
 					</dependencies>
 				</setting>
+				<setting id="smart_sleep.widget_x" type="integer" label="30651" help="">
+					<level>0</level>
+					<default>20</default>
+					<constraints>
+						<minimum>0</minimum>
+						<maximum>1920</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
+				<setting id="smart_sleep.widget_y" type="integer" label="30652" help="">
+					<level>0</level>
+					<default>20</default>
+					<constraints>
+						<minimum>0</minimum>
+						<maximum>1080</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
+				<setting id="smart_sleep.font_size" type="integer" label="30653" help="">
+					<level>0</level>
+					<default>28</default>
+					<constraints>
+						<minimum>12</minimum>
+						<maximum>60</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
+				<setting id="smart_sleep.panel_opacity" type="integer" label="30654" help="">
+					<level>0</level>
+					<default>200</default>
+					<constraints>
+						<minimum>0</minimum>
+						<maximum>255</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="smart_sleep.enabled">true</condition>
+						</dependency>
+					</dependencies>
+				</setting>
 				<setting id="smart_sleep.snooze_until" type="string" help="" visible="false">
 					<level>4</level>
 					<default/>
